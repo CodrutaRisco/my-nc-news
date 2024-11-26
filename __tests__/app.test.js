@@ -45,4 +45,46 @@ describe("GET /api/topics", () => {
   });
 });
 
+describe("GET /api/articles/:article_id", () => {
+  test("200: Response with an an article object", () => {
+    const article_id = 1;
+    return request(app)
+      .get(`/api/articles/${article_id}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toMatchObject({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("400: return 400 status for invalid article_id", () => {
+    return request(app)
+      .get(`/api/articles/invalid_id`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  test("404: return 404 status if article_id does not exit ", () => {
+    return request(app)
+      .get(`/api/articles/10000`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
+      });
+  });
+
+
+});
+
+
+
 
