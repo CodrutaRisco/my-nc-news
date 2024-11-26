@@ -5,7 +5,11 @@ exports.getArticleById = (req, res, next) => {
 
   selectArticleById(article_id)
     .then((article) => {
-      res.status(200).send({ article });
+      if (article) {
+        res.status(200).send({ article });
+      } else {
+        return Promise.reject({ status: 404, msg: "Not found" });
+      }
     })
     .catch((err) => {
       next(err);
