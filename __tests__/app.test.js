@@ -5,6 +5,7 @@ const request = require("supertest");
 const testData = require("../db/data/test-data");
 const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
+require("jest-sorted");
 
 /* Set up your beforeEach & afterAll functions here */
 beforeEach(() => {
@@ -85,6 +86,59 @@ describe("GET /api/articles/:article_id", () => {
 
 });
 
-
-
-
+describe("GET: /api/articles", () => {
+  test("respond with an articles array of article objects", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles).toHaveLength(13);
+        body.articles.forEach((article) => {
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(String),
+          });
+          expect(article.body).toBeUndefined();
+        });
+      });
+  });
+  test("respond with article sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("200: respond with articles sorted by existing sort_by column", () => {
+    return request(app)
+      .get("/api/articles?sort_by=created_at")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("400: respond 400 status for invalid sort_by column", () => {
+    return request(app)
+      .get("/api/articles?sort_by=invalid_id")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  test("404: return 404 status if sort_by does not exit ", () => {
+    return request(app)
+      .get(`/api/articles/10000`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
+      });
+  });
+});
