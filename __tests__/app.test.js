@@ -142,7 +142,3 @@ describe("GET: /api/articles", () => {
       });
   });
 });
-
-
-
-
