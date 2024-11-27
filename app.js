@@ -5,7 +5,11 @@ const {
   getArticleById,
   getArticles,
 } = require("./controllers/article.controllers");
-const { psqlErrors, handleCustomErrors } = require("./errors/handle-error");
+const {
+  psqlErrors,
+  handleCustomErrors,
+  handleServerErrors,
+} = require("./errors/handle-error");
 
 app.get("/api", getApi);
 app.get("/api/topics", getApiTopics);
@@ -14,6 +18,6 @@ app.get("/api/articles", getArticles);
 
 app.use(psqlErrors);
 app.use(handleCustomErrors);
-
+app.use(handleServerErrors);
 
 module.exports = app;

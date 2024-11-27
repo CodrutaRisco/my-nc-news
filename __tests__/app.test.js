@@ -105,6 +105,7 @@ describe("GET: /api/articles", () => {
             article_img_url: expect.any(String),
             comment_count: expect.any(String),
           });
+          expect(article.body).toBeUndefined();
         });
       });
   });
@@ -114,6 +115,30 @@ describe("GET: /api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("200: respond with articles sorted by existing sort_by column", () => {
+    return request(app)
+      .get("/api/articles?sort_by=created_at")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("400: respond 400 status for invalid sort_by column", () => {
+    return request(app)
+      .get("/api/articles?sort_by=invalid_id")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  test("404: return 404 status if sort_by does not exit ", () => {
+    return request(app)
+      .get(`/api/articles/10000`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
       });
   });
 });
