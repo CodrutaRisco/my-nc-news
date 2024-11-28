@@ -142,3 +142,46 @@ describe("GET: /api/articles", () => {
       });
   });
 });
+
+describe("GET: /api/articles/:article_id/comments", () => {
+  test("200: respond with an array of comments for the given article_id", () => {
+    const article_id = 9;
+
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toBeInstanceOf(Array);
+        expect(body.comments).toHaveLength(2);
+        body.comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          });
+        });
+      });
+  });
+  test("400: respond 400 status for invalid id", () => {
+    const article_id = "banana";
+
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  test("404: return 404 status if id not exit ", () => {
+    const article_id = 100001;
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
+      });
+  });
+});
