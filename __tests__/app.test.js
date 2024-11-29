@@ -27,6 +27,17 @@ describe("GET /api", () => {
   });
 });
 
+describe("ALL non-existent path", () => {
+  test("status: 404 - should return a custom error message when the path is not found", () => {
+    return request(app)
+      .get("/invalidPath")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("not found");
+      });
+  });
+});
+
 describe("GET /api/topics", () => {
   test("200: an array of topic object with 2 properties slug and descriptions", () => {
     return request(app)
@@ -82,8 +93,6 @@ describe("GET /api/articles/:article_id", () => {
         expect(body.msg).toBe("Not found");
       });
   });
-
-
 });
 
 describe("GET: /api/articles", () => {
@@ -185,3 +194,32 @@ describe("GET: /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: respond with 201 status for posted comment", () => {
+    const testComment = {
+      username: "butter_bridge",
+      body: "I would love to stand here and talk with you",
+    };
+    return request(app)
+      .post("/api/articles/11/comments")
+      .send(testComment)
+      .expect(201)
+      .then(({ body }) => {
+        const { comment } = body;
+
+        expect(typeof comment).toBe("object");
+        expect(Object.keys(comment)).toHaveLength(6);
+
+        expect(comment).toMatchObject({
+          comment_id: 19,
+          body: expect.any(String),
+          article_id: expect.any(Number),
+          author: expect.any(String),
+          votes: expect.any(Number),
+          created_at: expect.any(String),
+        });
+      });
+  });
+});
+

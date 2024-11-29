@@ -1,4 +1,6 @@
 const db = require("../db/connection");
+
+
 exports.selectArticleById = (article_id) => {
   const query = `SELECT articles.*
                  FROM articles
