@@ -16,6 +16,17 @@ afterAll(() => {
   return db.end();
 });
 
+describe("/invalid_url", () => {
+  test("status: 404 and message", () => {
+    return request(app)
+      .get("/invalid_url")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("not found");
+      });
+  });
+});
+
 describe("GET /api", () => {
   test("200: Responds with an object detailing the documentation for each endpoint", () => {
     return request(app)
