@@ -13,13 +13,14 @@ const {
 } = require("./errors/handle-error");
 const cors = require("cors");
 
+
+app.use(cors());
 app.get("/api", getApi);
 app.get("/api/topics", getApiTopics);
 app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getArticleComments);
 
-app.use(cors());
 app.use(psqlErrors);
 app.use(handleCustomErrors);
 app.use(handleServerErrors);
