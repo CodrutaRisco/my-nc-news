@@ -5,14 +5,17 @@ const {
   getArticleById,
   getArticles,
 } = require("./controllers/article.controllers");
-const { getArticleComments } = require("./controllers/comments-controller");
+const {
+  getArticleComments,
+  postComment,
+} = require("./controllers/comments-controller");
 const {
   psqlErrors,
   handleCustomErrors,
   handleServerErrors,
 } = require("./errors/handle-error");
 const cors = require("cors");
-
+app.use(express.json());
 
 app.use(cors());
 app.get("/api", getApi);
@@ -20,6 +23,8 @@ app.get("/api/topics", getApiTopics);
 app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getArticleComments);
+app.post("/api/articles/:article_id/comments", postComment);
+
 
 app.use(psqlErrors);
 app.use(handleCustomErrors);
