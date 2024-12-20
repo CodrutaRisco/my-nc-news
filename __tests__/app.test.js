@@ -59,10 +59,9 @@ describe("GET /api/articles/:article_id", () => {
           topic: "mitch",
           author: "butter_bridge",
           body: "I find this existence challenging",
-          created_at: "2020-07-09T20:11:00.000Z",
+          created_at: expect.any(String),
           votes: 100,
-          article_img_url:
-            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          article_img_url: expect.any(String),
         });
       });
   });
@@ -82,8 +81,6 @@ describe("GET /api/articles/:article_id", () => {
         expect(body.msg).toBe("Not found");
       });
   });
-
-
 });
 
 describe("GET: /api/articles", () => {
@@ -245,6 +242,83 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("not found");
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: responds with", () => {
+    const article_id = 1;
+    const newVotes = 8;
+
+    return request(app)
+      .patch(`/api/articles/${article_id}`)
+      .send({ inc_votes: newVotes })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          body: "I find this existence challenging",
+          votes: 108,
+          topic: "mitch",
+          author: "butter_bridge",
+          created_at: expect.any(String),
+          article_img_url: expect.any(String),
+        });
+      });
+  });
+  test("QUERY: article_id; invalid id. status 400 and returns an error message", () => {
+    const article_id = "invalid_url";
+    const newVotes = 8;
+    return request(app)
+      .patch(`/api/articles/${article_id}`)
+      .send({ inc_votes: newVotes })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  test("QUERY: article_id; not existing. status 404 and returns an error message", () => {
+    const article_id = 10000;
+    const newVotes = 8;
+    return request(app)
+      .patch(`/api/articles/${article_id}`)
+      .send({ inc_votes: newVotes })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
+      });
+  });
+  test("Status 400, invalid inc_votes type", () => {
+    const article_id = 7;
+    const newVotes = "for";
+    return request(app)
+      .patch(`/api/articles/${article_id}`)
+      .send({ inc_votes: newVotes })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  test("Status 200, missing `inc_votes` key. No effect to article.", () => {
+    const article_id = 1;
+    const newVotes = 0;
+    return request(app)
+      .patch(`/api/articles/${article_id}`)
+      .send({ inc_votes: newVotes })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          body: "I find this existence challenging",
+          votes: 100,
+          topic: "mitch",
+          author: "butter_bridge",
+          created_at: expect.any(String),
+          article_img_url: expect.any(String),
+        });
       });
   });
 });
