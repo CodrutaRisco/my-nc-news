@@ -44,6 +44,25 @@
       ]
     }
   },
+
+  "PATCH /api/articles/:article_id": {
+    "description": "serves an article objects with the votes either increased or decreased",
+    "queries": ["inc_votes"],
+    "exampleResponse": {
+      "article": [
+        {
+          "article_id": 1,
+          "title": "Living in the shadow of a great man",
+          "body": "I find this existence challenging",
+          "votes": 108,
+          "topic": "mitch",
+          "author": "butter_bridge",
+          "created_at": "2020-07-08T23:00:00.000Z"
+        }
+      ]
+    }
+  },
+
   "GET: /api/articles/:article_id/comments": {
     "description": "responds with an array of comments for the given article_id",
     "queries": [],
@@ -66,5 +85,23 @@
         }
       ]
     }
+  },
+
+  "POST /api/articles/article_id/comments": {
+    "description": "serves a new comment object",
+    "queries": ["body", "username"],
+    "exampleResponse": {
+      "comment": [
+        {
+          "comment_id": 19,
+          "author": "butter_bridge",
+          "article_id": 9,
+          "votes": 0,
+          "created_at": "2022-03-09T00:00:00.000Z",
+          "body": "I would love to stand here and talk with you — but I’m not going to."
+        }
+      ]
+    }
   }
 }
+

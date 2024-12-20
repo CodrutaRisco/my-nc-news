@@ -1,5 +1,6 @@
 const db = require("../db/connection");
 
+
 exports.selectArticleComments = (article_id) => {
   const query = `SELECT 
     comments.comment_id,
@@ -14,5 +15,17 @@ FROM comments
   ORDER BY comments.created_at DESC`;
   return db.query(query, [article_id]).then((result) => {
     return result.rows;
+  });
+};
+
+exports.addCommentByArticleId = (article_id, username, body) => {
+  const query = `
+    INSERT INTO comments (author, body, article_id)
+    VALUES ($1, $2, $3)
+    RETURNING *;
+  `;
+
+  return db.query(query, [username, body, article_id]).then(({ rows }) => {
+    return rows[0];
   });
 };

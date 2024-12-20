@@ -3,6 +3,7 @@ const {
   selectArticleById,
   selectArticles,
 } = require("../models/article.model");
+const { addCommentByArticleId } = require("../models/comments-model");
 
 exports.getArticleComments = (req, res, next) => {
   const { article_id } = req.params;
@@ -29,4 +30,18 @@ exports.getArticleComments = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+exports.postComment = (req, res, next) => {
+  const { article_id } = req.params;
+  const { username, body } = req.body;
+
+  if (!username || !body) {
+    return res.status(400).send({ msg: "Bad Request - Missing fields" });
+  }
+  addCommentByArticleId(article_id, username, body)
+    .then((comment) => {
+      res.status(201).send({ comment });
+    })
+    .catch(next);
 };
