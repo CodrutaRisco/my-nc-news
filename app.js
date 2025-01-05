@@ -9,6 +9,7 @@ const {
 const {
   getArticleComments,
   postComment,
+  deleteCommentById,
 } = require("./controllers/comments-controller");
 const {
   psqlErrors,
@@ -27,6 +28,7 @@ app.patch("/api/articles/:article_id", patchArticleById);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getArticleComments);
 app.post("/api/articles/:article_id/comments", postComment);
+app.delete("/api/comments/:comment_id", deleteCommentById);
 
 
 app.use(psqlErrors);

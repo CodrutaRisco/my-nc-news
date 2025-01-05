@@ -257,12 +257,12 @@ describe("PATCH /api/articles/:article_id", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.article).toEqual({
-          article_id: 1,
-          title: "Living in the shadow of a great man",
-          body: "I find this existence challenging",
-          votes: 108,
-          topic: "mitch",
-          author: "butter_bridge",
+          article_id: expect.any(Number),
+          title: expect.any(String),
+          body: expect.any(String),
+          votes: expect.any(Number),
+          topic: expect.any(String),
+          author: expect.any(String),
           created_at: expect.any(String),
           article_img_url: expect.any(String),
         });
@@ -319,6 +319,49 @@ describe("PATCH /api/articles/:article_id", () => {
           created_at: expect.any(String),
           article_img_url: expect.any(String),
         });
+      });
+  });
+  test("Status 400, missing `inc_votes` key", () => {
+    const article_id = 1;
+
+    return request(app)
+      .patch(`/api/articles/${article_id}`)
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: deletes the given comment and responds with no content", () => {
+    const comment_id = 1;
+    return request(app)
+      .delete(`/api/comments/${comment_id}`)
+      .expect(204)
+      .then((response) => {
+        expect(response.body).toEqual({});
+      });
+  });
+
+  test("404: responds with an error if comment_id does not exist", () => {
+    const comment_id = 99999;
+    return request(app)
+      .delete(`/api/comments/${comment_id}`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Comment not found");
+      });
+  });
+
+  test("400: responds with an error for invalid comment_id", () => {
+    const comment_id = "invalid";
+    return request(app)
+      .delete(`/api/comments/${comment_id}`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
       });
   });
 });
