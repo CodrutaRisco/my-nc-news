@@ -29,31 +29,25 @@ exports.getArticles = (req, res, next) => {
       .catch(next);
 };
 
-
 exports.patchArticleById = (req, res, next) => {
   const { article_id } = req.params;
   const { inc_votes } = req.body;
 
-  selectArticleById(article_id)
+  if (!Number(article_id)) {
+    return next({ status: 400, msg: "Invalid input" });
+  }
+  if (typeof inc_votes !== "number") {
+    return next({ status: 400, msg: "Invalid input" });
+  }
+
+  updateArticleById(inc_votes, article_id)
     .then((article) => {
-      if (article) {
-        return article.votes;
-      } else {
-        return Promise.reject({ status: 404, msg: "Not found" });
+      if (!article) {
+        return next({ status: 404, msg: "Not found" });
       }
+      res.status(200).send({ article });
     })
     .catch((err) => {
       next(err);
-    })
-    .then((votes) => {
-      let totalVotes = votes + inc_votes;
-
-      updateArticleById(totalVotes, article_id)
-        .then((article) => {
-          res.status(200).send({ article });
-        })
-        .catch((err) => {
-          next(err);
-        });
     });
 };

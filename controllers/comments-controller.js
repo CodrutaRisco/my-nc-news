@@ -4,6 +4,7 @@ const {
   selectArticles,
 } = require("../models/article.model");
 const { addCommentByArticleId } = require("../models/comments-model");
+const { removeCommentById } = require("../models/comments-model");
 
 exports.getArticleComments = (req, res, next) => {
   const { article_id } = req.params;
@@ -44,4 +45,16 @@ exports.postComment = (req, res, next) => {
       res.status(201).send({ comment });
     })
     .catch(next);
+};
+
+exports.deleteCommentById = (req, res, next) => {
+  const { comment_id } = req.params;
+
+  removeCommentById(comment_id)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
