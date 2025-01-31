@@ -113,6 +113,20 @@
       "status": 204,
       "body": {}
     }
+  },
+
+  "GET /api/users": {
+    "description": "Returns an array of all users.",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "john_doe",
+          "name": "John Doe",
+          "avatar_url": "https://example.com/avatar.jpg"
+        }
+      ]
+    }
   }
 }
 
