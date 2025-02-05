@@ -139,6 +139,25 @@ describe("GET: /api/articles", () => {
       });
   });
 });
+test("GET 200: Accepts optional query to filter by topic", () => {
+  return request(app)
+    .get("/api/articles?filter_by=mitch")
+    .expect(200)
+    .then(({ body }) => {
+      expect(body.articles.length).toBe(12);
+      body.articles.forEach((article) => {
+        expect(article).toMatchObject({
+          author: expect.any(String),
+          title: expect.any(String),
+          article_id: expect.any(Number),
+          topic: "mitch",
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+        });
+      });
+    });
+});
 
 describe("GET: /api/articles/:article_id/comments", () => {
   test("200: respond with an array of comments for the given article_id", () => {
