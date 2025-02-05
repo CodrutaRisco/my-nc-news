@@ -2,6 +2,7 @@ const {
   selectArticleById,
   selectArticles,
   updateArticleById,
+  updateVotesByArticle,
 } = require("../models/article.model");
 
 exports.getArticleById = (req, res, next) => {
@@ -21,12 +22,12 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-    const { sort_by } = req.query;
-    selectArticles(sort_by)
-      .then((articles) => {
-        res.status(200).send({ articles });
-      })
-      .catch(next);
+  const { sort_by, order, filter_by } = req.query;
+  selectArticles(sort_by, order, filter_by)
+    .then((result) => {
+      res.status(200).send({ articles: result });
+    })
+    .catch(next);
 };
 
 exports.patchArticleById = (req, res, next) => {
@@ -50,4 +51,14 @@ exports.patchArticleById = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+exports.updateArticleById = (req, res, next) => {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+  updateVotesByArticle(inc_votes, article_id)
+    .then((updatedArticle) => {
+      res.status(200).send({ updatedArticle });
+    })
+    .catch(next);
 };
