@@ -16,7 +16,7 @@ exports.selectArticles = async (
   topic
 ) => {
   let queryString = `
-  SELECT articles.author, articles.title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(comments) AS comment_count
+  SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, article_img_url, COUNT(comments) AS comment_count
   FROM articles
   LEFT JOIN comments
   ON articles.article_id = comments.article_id`;
@@ -24,7 +24,7 @@ exports.selectArticles = async (
   const queryValues = [];
 
   if (topic) {
-    queryString += ` WHERE topic = $1`;
+    queryString += ` WHERE articles.topic = $1`;
     queryValues.push(topic);
   }
 
