@@ -13,7 +13,7 @@ exports.selectArticleById = (article_id) => {
 exports.selectArticles = async (
   sortBy = "created_at",
   order = "DESC",
-  filterBy
+  topic
 ) => {
   let queryString = `
   SELECT articles.author, articles.title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(comments) AS comment_count
@@ -21,17 +21,17 @@ exports.selectArticles = async (
   LEFT JOIN comments
   ON articles.article_id = comments.article_id`;
 
-  if (filterBy) {
+  if (topic) {
     const validFilterQueries = [];
     const allTopics = await db.query("SELECT slug FROM topics");
     allTopics.rows.forEach((topic) => validFilterQueries.push(topic.slug));
-    if (!validFilterQueries.includes(filterBy)) {
+    if (!validFilterQueries.includes(topic)) {
       return Promise.reject({
         status: 400,
         msg: "Invalid Filter Query",
       });
     }
-    queryString += ` WHERE topic = '${filterBy}'`;
+    queryString += ` WHERE topic = '${topic}'`;
   }
 
   const validSortQueries = [];
