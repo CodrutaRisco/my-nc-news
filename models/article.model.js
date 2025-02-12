@@ -21,17 +21,11 @@ exports.selectArticles = async (
   LEFT JOIN comments
   ON articles.article_id = comments.article_id`;
 
+  const queryValues = [];
+
   if (topic) {
-    const validFilterQueries = [];
-    const allTopics = await db.query("SELECT slug FROM topics");
-    allTopics.rows.forEach((topic) => validFilterQueries.push(topic.slug));
-    if (!validFilterQueries.includes(topic)) {
-      return Promise.reject({
-        status: 400,
-        msg: "Invalid Filter Query",
-      });
-    }
-    queryString += ` WHERE topic = '${topic}'`;
+    queryString += ` WHERE topic = $1`;
+    queryValues.push(topic);
   }
 
   const validSortQueries = [];
@@ -43,26 +37,18 @@ exports.selectArticles = async (
   allColumns.rows.forEach((column) =>
     validSortQueries.push(column.column_name)
   );
+
   if (!validSortQueries.includes(sortBy)) {
     return Promise.reject({
       status: 400,
       msg: "Invalid input",
     });
   }
-
-  const validOrderQueries = ["asc", "desc", "ASC", "DESC"];
-  if (!validOrderQueries.includes(order)) {
-    return Promise.reject({
-      status: 400,
-      msg: "Invalid Order Query",
-    });
-  }
   queryString += ` GROUP BY articles.article_id ORDER BY ${sortBy} ${order}`;
-
-  return db.query(queryString).then(({ rows }) => {
-    return rows;
-  });
+  const { rows } = await db.query(queryString, queryValues);
+  return rows;
 };
+
 
 exports.updateArticleById = (inc_votes, article_id) => {
   return db
