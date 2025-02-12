@@ -141,7 +141,7 @@ describe("GET: /api/articles", () => {
 });
 test("GET 200: Accepts optional query to filter by topic", () => {
   return request(app)
-    .get("/api/articles?filter_by=mitch")
+    .get("/api/articles?topic=mitch")
     .expect(200)
     .then(({ body }) => {
       expect(body.articles.length).toBe(12);
