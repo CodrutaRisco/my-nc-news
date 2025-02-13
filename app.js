@@ -37,6 +37,7 @@ app.all("*", (req, res, next) => {
   res.status(404).send({ msg: "Route not found" });
 });
 
+
 app.use(psqlErrors);
 app.use(handleCustomErrors);
 app.use(handleServerErrors);

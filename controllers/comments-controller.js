@@ -35,12 +35,16 @@ exports.getArticleComments = (req, res, next) => {
 
 exports.postComment = (req, res, next) => {
   const { article_id } = req.params;
-  const { username, body } = req.body;
+  const { author, body } = req.body;
 
-  if (!username || !body) {
+  if (!author || !body) {
     return res.status(400).send({ msg: "Bad Request - Missing fields" });
   }
-  addCommentByArticleId(article_id, username, body)
+  if (isNaN(article_id)) {
+    return res.status(400).send({ msg: "Bad Request - Invalid article_id" });
+  }
+
+  addCommentByArticleId(author, body, article_id)
     .then((comment) => {
       res.status(201).send({ comment });
     })
