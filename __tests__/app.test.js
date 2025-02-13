@@ -204,7 +204,7 @@ describe("GET: /api/articles/:article_id/comments", () => {
 describe("POST /api/articles/:article_id/comments", () => {
   test("status: 201 - should respond with the posted comment", () => {
     const testComment = {
-      username: "butter_bridge",
+      author: "butter_bridge",
       body: "a new comment",
     };
     return request(app)
@@ -217,18 +217,19 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(typeof comment).toBe("object");
         expect(Object.keys(comment)).toHaveLength(6);
         expect(comment).toMatchObject({
-          comment_id: 19,
           body: expect.any(String),
           article_id: expect.any(Number),
           author: expect.any(String),
           votes: expect.any(Number),
           created_at: expect.any(String),
         });
+        expect(comment.comment_id).toBeDefined();
+        expect(typeof comment.comment_id).toBe("number");
       });
   });
   test("status: 201 - should ignore unnecessary properties given", () => {
     const testComment = {
-      username: "butter_bridge",
+      author: "butter_bridge",
       body: "a new comment",
       unnecessaryProperty: "unnecessary",
     };
@@ -239,7 +240,7 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
   test("status: 400 - should respond with bad request when article_id is an invalid type", () => {
     const testComment = {
-      username: "butter_bridge",
+      author: "butter_bridge",
       body: "a new comment",
     };
     return request(app)
@@ -247,12 +248,27 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(testComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Invalid input");
+        expect(body.msg).toBe("Bad Request - Invalid article_id");
       });
   });
+
+  test("status: 400 - should respond with bad request when required fields are missing", () => {
+    const testComment = {
+      author: "butter_bridge",
+      // body missing
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(testComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request - Missing fields");
+      });
+  });
+
   test("status 404 - should respond with not found when username is an a non existent user", () => {
     const testComment = {
-      username: "obi",
+      author: "obi",
       body: "a new comment",
     };
     return request(app)
@@ -260,10 +276,26 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(testComment)
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("not found");
+        expect(body.msg).toBe("Not found - User does not exist");
+      });
+  });
+
+  test("status 404 - should respond with not found when article_id does not exist", () => {
+    const testComment = {
+      author: "butter_bridge",
+      body: "a new comment",
+    };
+    return request(app)
+      .post("/api/articles/99999/comments")
+      .send(testComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
       });
   });
 });
+
+
 
 describe("PATCH /api/articles/:article_id", () => {
   test("200: responds with", () => {

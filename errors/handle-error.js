@@ -18,5 +18,9 @@ exports.handleCustomErrors = (err, req, res, next) => {
 
 exports.handleServerErrors = (err, req, res, next) => {
   console.err(err);
-  res.status(500).send({ msg: "Internal Server Error" });
+  
+  console.error(err.stack); // Important for debugging
+  const status = err.status || 500; // Default to 500 if status not set
+  const msg = err.msg || "Internal Server Error"; // Default message
+  res.status(status).send({ msg });
 };

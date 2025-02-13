@@ -18,17 +18,40 @@ FROM comments
   });
 };
 
-exports.addCommentByArticleId = (article_id, username, body) => {
-  const query = `
-    INSERT INTO comments (author, body, article_id)
-    VALUES ($1, $2, $3)
-    RETURNING *;
-  `;
+exports.addCommentByArticleId = (author, body, article_id) => {
+  return db
+    .query("SELECT * FROM articles WHERE article_id = $1", [article_id])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Article not found",
+        });
+      }
 
-  return db.query(query, [username, body, article_id]).then(({ rows }) => {
-    return rows[0];
-  });
+      const query = `
+        INSERT INTO comments (author, body, article_id)
+        VALUES ($1, $2, $3)
+        RETURNING *;
+      `;
+
+      return db.query(query, [author, body, article_id]);
+    })
+    .then(({ rows }) => {
+      return rows[0];
+    })
+    .catch((err) => {
+      if (err.code === "23503" && err.constraint.includes("author")) {
+        return Promise.reject({
+          status: 404,
+          msg: "Not found - User does not exist",
+        });
+      }
+      return Promise.reject(err);
+    });
 };
+
+
 
 exports.removeCommentById = (comment_id) => {
   return db
