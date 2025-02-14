@@ -20,6 +20,7 @@ const { fetchUsers } = require("./controllers/users-controllers");
 const cors = require("cors");
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
 app.get("/api", getApi);

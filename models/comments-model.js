@@ -18,7 +18,7 @@ FROM comments
   });
 };
 
-exports.addCommentByArticleId = (author, body, article_id) => {
+exports.addCommentByArticleId = (article_id, author, body) => {
   return db
     .query("SELECT * FROM articles WHERE article_id = $1", [article_id])
     .then(({ rows }) => {
