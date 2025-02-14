@@ -34,17 +34,24 @@ exports.getArticleComments = (req, res, next) => {
 };
 
 exports.postComment = (req, res, next) => {
+
   const { article_id } = req.params;
   const { author, body } = req.body;
 
-  if (!author || !body) {
+  if (
+    !author ||
+    !body ||
+    typeof body !== "string" ||
+    author.trim() === "" ||
+    body.trim() === ""
+  ) {
     return res.status(400).send({ msg: "Bad Request - Missing fields" });
   }
   if (isNaN(article_id)) {
     return res.status(400).send({ msg: "Bad Request - Invalid article_id" });
   }
 
-  addCommentByArticleId(author, body, article_id)
+  addCommentByArticleId(article_id, author, body)
     .then((comment) => {
       res.status(201).send({ comment });
     })

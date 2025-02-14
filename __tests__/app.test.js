@@ -266,6 +266,18 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 
+  test("should respond with bad request when required fields are missing", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ author: "butter_bridge" }) // Missing "body"
+      .expect(400)
+      .then(({ body }) => {
+        console.log(body); // Debugging step
+        expect(body.msg).toBe("Bad Request - Missing fields");
+      });
+  });
+  
+
   test("status 404 - should respond with not found when username is an a non existent user", () => {
     const testComment = {
       author: "obi",
