@@ -60,7 +60,9 @@ exports.postComment = (req, res, next) => {
 
 exports.deleteCommentById = (req, res, next) => {
   const { comment_id } = req.params;
-
+if (!comment_id) {
+  return res.status(400).send({ msg: "Missing comment_id" });
+}
   removeCommentById(comment_id)
     .then(() => {
       res.status(204).send();
