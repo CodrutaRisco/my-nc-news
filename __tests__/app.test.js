@@ -272,7 +272,6 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send({ author: "butter_bridge" }) // Missing "body"
       .expect(400)
       .then(({ body }) => {
-        console.log(body); // Debugging step
         expect(body.msg).toBe("Bad Request - Missing fields");
       });
   });
