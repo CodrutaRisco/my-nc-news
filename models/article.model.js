@@ -16,10 +16,12 @@ exports.selectArticles = async (
   topic
 ) => {
   let queryString = `
-  SELECT articles.author, articles.title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(comments) AS comment_count
+  SELECT articles.author, articles.title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, CAST(COUNT(comments.comment_id) AS INTEGER) AS comment_count
   FROM articles
   LEFT JOIN comments
   ON articles.article_id = comments.article_id`;
+  // GROUP BY articles.article_id
+  // ORDER BY ${sortBy} ${order}`;
 
   if (topic) {
     const validFilterQueries = [];
@@ -28,21 +30,30 @@ exports.selectArticles = async (
     if (!validFilterQueries.includes(topic)) {
       return Promise.reject({
         status: 400,
-        msg: "Invalid Filter Query",
+        msg: "Invalid input",
       });
     }
-    queryString += ` WHERE topic = '${topic}'`;
+    queryString += ` WHERE articles.topic = '${topic}'`;
   }
 
-  const validSortQueries = [];
-  const allColumns = await db.query(`
-    SELECT column_name
-    FROM information_schema.columns
-    WHERE table_name = 'articles';
-  `);
-  allColumns.rows.forEach((column) =>
-    validSortQueries.push(column.column_name)
-  );
+  const validSortQueries = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "article_img_url",
+    "comment_count",
+  ];
+  // const allColumns = await db.query(`
+  //   SELECT column_name
+  //   FROM information_schema.columns
+  //   WHERE table_name = 'articles';
+  // `);
+  // allColumns.rows.forEach((column) =>
+  //   validSortQueries.push(column.column_name)
+  // );
   if (!validSortQueries.includes(sortBy)) {
     return Promise.reject({
       status: 400,
@@ -54,7 +65,7 @@ exports.selectArticles = async (
   if (!validOrderQueries.includes(order)) {
     return Promise.reject({
       status: 400,
-      msg: "Invalid Order Query",
+      msg: "Invalid input",
     });
   }
   queryString += ` GROUP BY articles.article_id ORDER BY ${sortBy} ${order}`;
