@@ -21,6 +21,8 @@ exports.selectArticles = async (
   LEFT JOIN comments
   ON articles.article_id = comments.article_id`;
 
+  const queryParams = [];
+
   if (topic) {
     const validFilterQueries = [];
     const allTopics = await db.query("SELECT slug FROM topics");
@@ -31,7 +33,8 @@ exports.selectArticles = async (
         msg: "Invalid input",
       });
     }
-    queryString += ` WHERE articles.topic = '${topic}'`;
+    queryString += ` WHERE articles.topic = $1`;
+    queryParams.push(topic);
   }
 
   const validSortQueries = [
@@ -61,7 +64,7 @@ exports.selectArticles = async (
   }
   queryString += ` GROUP BY articles.article_id,articles.author, articles.title, articles.topic, articles.created_at, articles.votes, articles.article_img_url ORDER BY ${sortBy} ${order}`;
 
-  return db.query(queryString).then(({ rows }) => {
+  return db.query(queryString, queryParams).then(({ rows }) => {
     return rows;
   });
 };
