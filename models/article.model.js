@@ -20,8 +20,6 @@ exports.selectArticles = async (
   FROM articles
   LEFT JOIN comments
   ON articles.article_id = comments.article_id`;
-  // GROUP BY articles.article_id
-  // ORDER BY ${sortBy} ${order}`;
 
   if (topic) {
     const validFilterQueries = [];
@@ -46,14 +44,7 @@ exports.selectArticles = async (
     "article_img_url",
     "comment_count",
   ];
-  // const allColumns = await db.query(`
-  //   SELECT column_name
-  //   FROM information_schema.columns
-  //   WHERE table_name = 'articles';
-  // `);
-  // allColumns.rows.forEach((column) =>
-  //   validSortQueries.push(column.column_name)
-  // );
+
   if (!validSortQueries.includes(sortBy)) {
     return Promise.reject({
       status: 400,
@@ -68,7 +59,7 @@ exports.selectArticles = async (
       msg: "Invalid input",
     });
   }
-  queryString += ` GROUP BY articles.article_id ORDER BY ${sortBy} ${order}`;
+  queryString += ` GROUP BY articles.article_id,articles.author, articles.title, articles.topic, articles.created_at, articles.votes, articles.article_img_url ORDER BY ${sortBy} ${order}`;
 
   return db.query(queryString).then(({ rows }) => {
     return rows;
